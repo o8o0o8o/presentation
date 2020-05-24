@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+
+    <title>reveal.js</title>
+
+    <link rel="stylesheet" href="dist/reset.css" />
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/black.css" id="theme" />
+
+    <!-- Theme used for syntax highlighted code -->
+    <link
+      rel="stylesheet"
+      href="plugin/highlight/monokai.css"
+      id="highlight-theme"
+    />
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section>
+          <h3>Prehistoric times</h3>
+          <p>
+            Before the advent of HTML5, we had limited control over browser
+            history we were not able to control and manipulate the session
+            history of a particular browsing context. We could go back and forth
+            using the available methods, but that was not without incurring page
+            reloads or relying on <code>location.hash</code> workarounds. With
+            the HTML5 History API, we have more control with the browser
+            history. For example, we have a way to add an entry in the history,
+            or change the URL in the address bar without refreshing the page.
+          </p>
+        </section>
+        <section>
+          <h3>Browser Support</h3>
+          <p>Browser support for the HTML5 History API is quite good.</p>
+          <p>
+            <a href="https://caniuse.com/#feat=history"
+              >https://caniuse.com/#feat=history</a
+            >
+          </p>
+        </section>
+        <section>
+          <img src="./img/browser_support.png" />
+        </section>
+        <section>
+          <h3>Why A History API?</h3>
+          <p>
+            If you like building apps without heavy frameworks or routing
+            libraries, this one’s for you.
+          </p>
+          <p>
+            It allows us to build applications in an SEO-friendly manner.
+            Furthermore, this technique allows us to reduce bandwidth. That
+            means we will load all required resources on the first page load.
+            From there onward, the application will download only the required
+            contents. In other words, instead of loading all resources all the
+            time, it will load only required resources from a second content
+            request. Note that you need to perform some server-side coding to
+            deliver only partial resources instead of full page content.
+          </p>
+        </section>
+        <section>
+          <p>
+            Another reason to use this API is because users love the browser’s
+            back button.
+          </p>
+          <p>
+            It even
+            <a
+              href="http://www.internetnews.com/skerner/2010/07/what-is-the-most-clicked-firef.html"
+            >
+              won an award</a
+            >
+            as the most pressed button in Firefox back in the day. So your app
+            should definitely 100% expect that users will try to use the back
+            button everywhere in your app to return to previous views.
+          </p>
+        </section>
+        <section>
+          <h3>Basic concepts and syntax</h3>
+          <p>
+            The History API relies on a single DOM interface — the
+            <b>History</b> object. There is a unique <b>History</b> object
+            defined for each tab, accessed through the <b>history</b> attribute
+            of the Window interface. This can be manipulated using JavaScript
+            along with some special methods. To relate this to the actual pages
+            in your session <b>history</b>, each Document object is associated
+            with a unique instance of the tab's <b>History</b> object (they all
+            model the same underlying session <b>history</b>).
+          </p>
+        </section>
+        <section>
+          <p>
+            <b>History</b> objects represent each tab's session
+            <b>history</b> as a flat, comma-separated list of session
+            <b>history</b> entries. Each session <b>history</b> entry consists
+            of a URL or a state object (or both), and in addition can have a
+            title, a Document object, form data, a scroll position, and other
+            information associated with it.
+          </p>
+        </section>
+        <section>
+          <h3>The basic methods of the history object are:</h3>
+          <code>
+            <ul>
+              <li>
+                window.history.length
+              </li>
+              <li>window.history.state</li>
+              <li>
+                window.history.go(n)
+              </li>
+              <li>
+                window.history.back()
+              </li>
+              <li>
+                window.history.forward()
+              </li>
+              <li>
+                window.history.pushState(data, title [, url])
+              </li>
+              <li>
+                window.history.replaceState(data, title [, url])
+              </li>
+            </ul></code
+          >
+        </section>
+        <section>
+          <h3>View as a function of state</h3>
+          <p>
+            The History API assumes that your view is a function of state — that
+            is, what is displayed on screen depends on a global state object.
+            This allows the browser to store all your states so that when a user
+            presses the back button, they return to the previous state as
+            expected.
+          </p>
+          <p>
+            So to use the History API, you must have a global state of some kind
+            that your views depend on.
+          </p>
+        </section>
+        <section>
+          <p>
+            The flow looks like this:
+          </p>
+          <p>
+            user event -> update state -> re-render
+          </p>
+          <p>
+            Every action should trigger a state change, which triggers a
+            re-render.
+          </p>
+        </section>
+        <section>
+          <h3>Manipulating History</h3>
+          <p>
+            To use the browser’s history functionality, you begin by telling the
+            browser to remember your initial state. This requires the
+            replaceState method like so:
+          </p>
+          <code> window.history.replaceState(state, null, "")</code>
+          <p>
+            If you want to change URL be sure to update your server side code to
+            handle the path
+          </p>
+        </section>
+        <section>
+          <p>
+            Whenever the user does something that updates state, such as
+            clicking a checkbox or navigating to a different view, you will need
+            to update your state and then store it in the browser. After
+            updating your state, call this:
+          </p>
+          <code>window.history.pushState(state, null, "")</code>
+          <p>
+            With every push, the browser gathers more and more states that it
+            can cycle through if the user wants to start cycling back.
+          </p>
+        </section>
+        <section>
+          <p>
+            The browser’s back button triggers the onpopstate listener, which
+            connects to the History API
+          </p>
+          <code>
+            <p>window.onpopstate = function (event) {</p>
+            <p>if (event.state) {</p>
+            <p>state = event.state;</p>
+            <p>}</p>
+            <p>render(state);</p>
+            <p>};</p>
+          </code>
+          <p>
+            Event has a property state that has old state. Just set your
+            application state to this old state and trigger a re-render to
+            display the old state
+          </p>
+        </section>
+        <section>
+          <video src="./video/demo.mp4" autoplay controls="controls"></video>
+        </section>
+        <section>
+          <img src="./img/code.png" height="650" />
+        </section>
+        <section>
+          <h3>Summary</h3>
+          <p>
+            Now we have some understanding of the History interface. We used
+            pushState to add entries to the browsing context's history and the
+            popstate event to react to state changes. What's more, each file
+            that has been navigated to can be accessed later at its real URL.
+            This highlights the real usefulness of the history API: you can
+            create Ajaxy navigation in the style of Facebook or Twitter, without
+            breaking the back button or the URLs to individual pages. Although
+            bear in mind that hashbangs don't work if you share the URL with
+            someone who has scripting disabled.
+          </p>
+        </section>
+      </div>
+    </div>
+    <script src="dist/reveal.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script>
+      // More info about initialization & config:
+      // - https://revealjs.com/initialization/
+      // - https://revealjs.com/config/
+      Reveal.initialize({
+        hash: true,
+
+        // Learn about plugins: https://revealjs.com/plugins/
+        plugins: [RevealMarkdown, RevealHighlight, RevealNotes],
+      });
+    </script>
+  </body>
+</html>
